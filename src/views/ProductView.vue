@@ -19,7 +19,7 @@ watchEffect(() => {
 <template>
   <div class="p-6 bg-base-100 rounded-lg shadow w-full">
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-bold">Detail Produk</h2>
+      <h2 class="text-xl font-bold">{{ $t('product.productDetail') }}</h2>
       <form
         @submit.prevent="$router.replace(`/products/detail/${selectedIdProduct}`)"
         class="flex items-center gap-1"
@@ -29,8 +29,7 @@ watchEffect(() => {
             {{ product.name }}
           </option>
         </select>
-
-        <button type="submit" class="btn btn-primary">Pindah</button>
+        <button type="submit" class="btn btn-primary">{{ $t('common.move') }}</button>
       </form>
     </div>
 
@@ -38,7 +37,7 @@ watchEffect(() => {
       v-if="product"
       class="h-96 flex items-center justify-center mt-6 p-4 bg-gray-100 rounded-md text-lg font-semibold"
     >
-      Nama: {{ product?.name }}
+      {{ $t('product.name') }}: {{ product?.name }}
     </div>
   </div>
 </template>

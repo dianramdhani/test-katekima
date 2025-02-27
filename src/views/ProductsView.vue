@@ -11,13 +11,14 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
 } from '@heroicons/vue/24/solid'
+import { ArrowUpIcon } from '@heroicons/vue/16/solid'
 
 const store = useProductStore()
 const { deleteProduct } = store
 const { paginatedProducts: products, query, totalPages } = storeToRefs(store)
 
 watch(
-  () => query.value.search,
+  () => [query.value.search, query.value.limit],
   () => {
     query.value.page = 1
   },
@@ -27,14 +28,14 @@ watch(
 <template>
   <div class="p-6 bg-base-100 rounded-lg shadow">
     <!-- Header Card -->
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-bold">Produk</h2>
+    <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-4">
+      <h2 class="text-xl font-bold">{{ $t('product.product') }}</h2>
       <span class="flex items-center gap-1">
         <input
           type="text"
           v-model="query.search"
-          placeholder="Cari produk"
-          class="input input-bordered w-64"
+          :placeholder="$t('product.searchProduct')"
+          class="input input-bordered lg:w-64"
         />
         <select v-model="query.limit" class="select select-bordered">
           <option :value="10">10</option>
@@ -53,11 +54,15 @@ watch(
     <table class="table w-full">
       <thead>
         <tr>
-          <th>No</th>
-          <th @click="query.order = query.order === 'asc' ? 'desc' : 'asc'" class="cursor-pointer">
-            Nama <span>{{ query.order.toUpperCase() }}</span>
+          <th>{{ $t('product.no') }}</th>
+          <th
+            @click="query.order = query.order === 'asc' ? 'desc' : 'asc'"
+            class="flex items-center gap-1 cursor-pointer hover:text-primary"
+          >
+            {{ $t('product.name') }}
+            <ArrowUpIcon class="w-3 h-3" :class="{ 'rotate-180': query.order === 'desc' }" />
           </th>
-          <th class="text-right">Aksi</th>
+          <th class="text-right">{{ $t('product.action') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -87,7 +92,7 @@ watch(
 
     <!-- Pagination -->
     <div class="flex justify-between items-center mt-4">
-      <p>Page: {{ query.page }}</p>
+      <p>{{ $t('common.page') }}: {{ query.page }}</p>
       <div class="flex gap-2">
         <button class="btn btn-sm btn-outline" :disabled="query.page === 1" @click="--query.page">
           <ChevronLeftIcon class="w-5 h-5" />

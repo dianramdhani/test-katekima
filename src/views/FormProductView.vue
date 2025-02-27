@@ -14,6 +14,7 @@ const isDropdownOpen = ref(false)
 const filteredNames = computed(() =>
   names.value.filter((n) => n.toLowerCase().includes(name.value.toLowerCase())),
 )
+const isEdit = computed(() => !!route.params.id)
 
 const onSelectName = (selectedName: string) => {
   name.value = selectedName
@@ -35,15 +36,19 @@ watchEffect(() => {
 
 <template>
   <div class="p-6 bg-base-100 rounded-lg shadow w-full">
-    <h2 class="text-xl font-bold mb-4">Form Input</h2>
+    <h2 class="text-xl font-bold mb-4">
+      {{ isEdit ? $t('common.formEdit') : $t('common.formCreate') }}
+    </h2>
     <form @submit.prevent="onSubmit" class="space-y-4">
       <div class="form-control relative">
-        <label for="name" class="label">Pilih / Input Nama</label>
+        <label for="name" class="label"
+          >{{ $t('common.select') }} / {{ $t('product.inputName') }}</label
+        >
         <input
           id="name"
           v-model="name"
           class="input input-bordered w-full"
-          placeholder="Pilih atau ketik nama..."
+          :placeholder="$t('product.selectOrInputName')"
           @focus="isDropdownOpen = true"
           @input="isDropdownOpen = true"
           @blur="isDropdownOpen = false"
@@ -65,7 +70,7 @@ watchEffect(() => {
         </ul>
       </div>
 
-      <button type="submit" class="btn btn-primary w-full">Simpan</button>
+      <button type="submit" class="btn btn-primary w-full">{{ $t('common.save') }}</button>
     </form>
   </div>
 </template>
