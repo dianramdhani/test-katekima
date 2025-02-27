@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { computed, onMounted, reactive, ref, watchEffect } from 'vue'
 import { v7 as uuid } from 'uuid'
 import { loadFromLocalStorage, saveToLocalStorage, STORAGE_KEY_PRODUCTS } from '@/utils/helpers'
+import { useRoute, useRouter } from 'vue-router'
 
 type ProductsResponse = {
   count: number
@@ -25,6 +26,8 @@ type PaginatedProduct = Product & { no: number }
 const API_PRODUCTS = import.meta.env.VITE_APP_API_PRODUCTS
 
 export const useProductStore = defineStore('product', () => {
+  const route = useRoute()
+  const router = useRouter()
   const products = ref(loadFromLocalStorage<Product[]>(STORAGE_KEY_PRODUCTS, []))
   const query = reactive<{
     search: string
@@ -33,11 +36,11 @@ export const useProductStore = defineStore('product', () => {
     sortBy: keyof Product
     order: 'asc' | 'desc'
   }>({
-    search: '',
-    page: 1,
-    limit: 10,
-    sortBy: 'name',
-    order: 'asc',
+    search: (route.query.search as string) || '',
+    page: Number(route.query.page) || 1,
+    limit: Number(route.query.limit) || 10,
+    sortBy: (route.query.sortBy as keyof Product) || 'name',
+    order: (route.query.order as 'asc' | 'desc') || 'asc',
   })
   const filteredProducts = computed(() =>
     products.value
@@ -89,6 +92,18 @@ export const useProductStore = defineStore('product', () => {
 
   watchEffect(() => {
     saveToLocalStorage(STORAGE_KEY_PRODUCTS, products.value)
+  })
+
+  watchEffect(() => {
+    const newQuery = {
+      search: query.search || undefined,
+      page: query.page !== 1 ? query.page : undefined,
+      limit: query.limit !== 10 ? query.limit : undefined,
+      sortBy: query.sortBy !== 'name' ? query.sortBy : undefined,
+      order: query.order !== 'asc' ? query.order : undefined,
+    }
+
+    router.replace({ query: { ...route.query, ...newQuery } })
   })
 
   return {
