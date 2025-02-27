@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { v7 as uuid } from 'uuid'
 
 type ProductsResponse = {
@@ -19,10 +19,40 @@ export type Product = {
   name: string
 }
 
+type PaginatedProduct = Product & { no: number }
+
 const API_PRODUCTS = import.meta.env.VITE_APP_API_PRODUCTS
 
 export const useProductStore = defineStore('product', () => {
   const products = ref<Product[]>([])
+  const query = reactive<{
+    search: string
+    page: number
+    limit: number
+    sortBy: keyof Product
+    order: 'asc' | 'desc'
+  }>({
+    search: '',
+    page: 1,
+    limit: 10,
+    sortBy: 'name',
+    order: 'asc',
+  })
+  const filteredProducts = computed(() =>
+    products.value
+      .filter((product) => product.name.toLowerCase().includes(query.search.toLowerCase()))
+      .sort((a, b) => {
+        const valA = a[query.sortBy]
+        const valB = b[query.sortBy]
+        return query.order === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA)
+      })
+      .map<PaginatedProduct>((product, index) => ({ ...product, no: index + 1 })),
+  )
+  const paginatedProducts = computed(() => {
+    const start = (query.page - 1) * query.limit
+    return filteredProducts.value.slice(start, start + query.limit)
+  })
+  const totalPages = computed(() => Math.ceil(filteredProducts.value.length / query.limit))
 
   const getIdByUrl = (url: string) => {
     const parts = url.split('/')
@@ -60,5 +90,13 @@ export const useProductStore = defineStore('product', () => {
     fetchProduct()
   })
 
-  return { products, addProduct, deleteProduct, updateProduct, getProduct }
+  return {
+    paginatedProducts,
+    query,
+    totalPages,
+    addProduct,
+    deleteProduct,
+    updateProduct,
+    getProduct,
+  }
 })

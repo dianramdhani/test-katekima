@@ -14,8 +14,8 @@ const router = createRouter({
       path: '/products',
       children: [
         { path: '', component: ProductsView },
-        { path: 'detail/:id?', component: ProductView },
-        { path: 'form/:id', component: FormProductView },
+        { path: 'detail/:id', component: ProductView },
+        { path: 'form/:id?', component: FormProductView },
       ],
     },
   ],
