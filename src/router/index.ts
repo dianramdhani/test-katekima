@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import ProductsView from '@/views/ProductsView.vue'
+import FormProductView from '@/views/FormProductView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -10,8 +11,10 @@ const router = createRouter({
     },
     {
       path: '/products',
-      name: 'products',
-      component: ProductsView,
+      children: [
+        { path: '', component: ProductsView },
+        { path: 'form/:id?', component: FormProductView },
+      ],
     },
   ],
 })
