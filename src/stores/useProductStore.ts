@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watchEffect } from 'vue'
 import { v7 as uuid } from 'uuid'
+import { loadFromLocalStorage, saveToLocalStorage, STORAGE_KEY_PRODUCTS } from '@/utils/helpers'
 
 type ProductsResponse = {
   count: number
@@ -24,7 +25,7 @@ type PaginatedProduct = Product & { no: number }
 const API_PRODUCTS = import.meta.env.VITE_APP_API_PRODUCTS
 
 export const useProductStore = defineStore('product', () => {
-  const products = ref<Product[]>([])
+  const products = ref(loadFromLocalStorage<Product[]>(STORAGE_KEY_PRODUCTS, []))
   const query = reactive<{
     search: string
     page: number
@@ -54,18 +55,8 @@ export const useProductStore = defineStore('product', () => {
   })
   const totalPages = computed(() => Math.ceil(filteredProducts.value.length / query.limit))
 
-  const getIdByUrl = (url: string) => {
-    const parts = url.split('/')
-    return parts[parts.length - 2]
-  }
-
-  const fetchProduct = async () => {
-    const res = await fetch(API_PRODUCTS)
-    const data: ProductsResponse = await res.json()
-    products.value = data.results.map((product) => ({
-      id: getIdByUrl(product.url),
-      name: product.name,
-    }))
+  const getProduct = (id: string) => {
+    return products.value.find((product) => product.id === id)
   }
 
   const addProduct = (name: string) => {
@@ -82,22 +73,32 @@ export const useProductStore = defineStore('product', () => {
     )
   }
 
-  const getProduct = (id: string) => {
-    return products.value.find((product) => product.id === id)
-  }
+  onMounted(async () => {
+    if (!products.value.length) {
+      const res = await fetch(API_PRODUCTS)
+      const data: ProductsResponse = await res.json()
+      products.value = data.results.map((product) => {
+        const parts = product.url.split('/')
+        return {
+          id: parts[parts.length - 2],
+          name: product.name,
+        }
+      })
+    }
+  })
 
-  onMounted(() => {
-    fetchProduct()
+  watchEffect(() => {
+    saveToLocalStorage(STORAGE_KEY_PRODUCTS, products.value)
   })
 
   return {
     products,
-    paginatedProducts,
     query,
+    paginatedProducts,
     totalPages,
+    getProduct,
     addProduct,
     deleteProduct,
     updateProduct,
-    getProduct,
   }
 })
