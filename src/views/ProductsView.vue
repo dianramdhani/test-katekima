@@ -5,6 +5,7 @@ import { watchEffect } from 'vue'
 import { RouterLink } from 'vue-router'
 
 const store = useProductStore()
+const { deleteProduct } = store
 const { products } = storeToRefs(store)
 
 watchEffect(() => {
@@ -26,11 +27,13 @@ watchEffect(() => {
         <td>{{ index + 1 }}</td>
         <td>{{ product.name }}</td>
         <td>
-          <button>detail</button>
+          <RouterLink :to="`/products/detail/${product.id}`">
+            <button>detail</button>
+          </RouterLink>
           <RouterLink :to="`/products/form/${product.id}`">
             <button>edit</button>
           </RouterLink>
-          <button>delete</button>
+          <button @click="() => deleteProduct(product.id)">delete</button>
         </td>
       </tr>
     </tbody>

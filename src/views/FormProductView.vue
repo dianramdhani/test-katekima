@@ -1,11 +1,14 @@
 <script setup lang="ts">
+import { useNameStore } from '@/stores/useNameStore'
 import { useProductStore } from '@/stores/useProductStore'
+import { storeToRefs } from 'pinia'
 import { ref, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
 const router = useRouter()
 const { getProduct, addProduct, updateProduct } = useProductStore()
+const { names } = storeToRefs(useNameStore())
 const name = ref('')
 
 const onSubmit = () => {
@@ -23,6 +26,9 @@ watchEffect(() => {
 
 <template>
   <form @submit.prevent="onSubmit">
+    <select name="_name" id="_name">
+      <option v-for="(name, index) in names" :key="index" :value="name">{{ name }}</option>
+    </select>
     <input name="name" id="name" v-model="name" />
     <button type="submit">Simpan</button>
   </form>

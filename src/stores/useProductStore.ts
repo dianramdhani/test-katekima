@@ -14,7 +14,7 @@ type RawProduct = {
   url: string
 }
 
-type Product = {
+export type Product = {
   id: string
   name: string
 }
