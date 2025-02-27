@@ -91,6 +91,7 @@ export const useProductStore = defineStore('product', () => {
   })
 
   return {
+    products,
     paginatedProducts,
     query,
     totalPages,
