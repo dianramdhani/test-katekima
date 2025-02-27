@@ -95,6 +95,14 @@ export const useProductStore = defineStore('product', () => {
   })
 
   watchEffect(() => {
+    if (route.path !== '/products') {
+      query.search = ''
+      query.page = 1
+      query.limit = 10
+      query.sortBy = 'name'
+      query.order = 'asc'
+    }
+
     const newQuery = {
       search: query.search || undefined,
       page: query.page !== 1 ? query.page : undefined,
