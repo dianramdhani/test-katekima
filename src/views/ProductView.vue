@@ -7,7 +7,7 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 const store = useProductStore()
 const { getProduct } = store
-const { products } = storeToRefs(store)
+const { products, isLoading } = storeToRefs(store)
 const product = ref<Product>()
 const selectedIdProduct = ref(Number(route.params.id))
 
@@ -39,5 +39,6 @@ watchEffect(() => {
     >
       {{ $t('product.name') }}: {{ product?.name }}
     </div>
+    <div v-else-if="isLoading" class="skeleton h-96" />
   </div>
 </template>

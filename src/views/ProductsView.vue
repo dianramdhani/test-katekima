@@ -15,7 +15,7 @@ import { ArrowUpIcon } from '@heroicons/vue/16/solid'
 
 const store = useProductStore()
 const { deleteProduct } = store
-const { paginatedProducts: products, query, totalPages } = storeToRefs(store)
+const { paginatedProducts: products, query, totalPages, isLoading } = storeToRefs(store)
 
 watch(
   () => [query.value.search, query.value.limit],
@@ -54,7 +54,7 @@ watch(
     <table class="table w-full">
       <thead>
         <tr>
-          <th>{{ $t('product.no') }}</th>
+          <th class="lg:w-28">{{ $t('product.no') }}</th>
           <th
             @click="query.order = query.order === 'asc' ? 'desc' : 'asc'"
             class="flex items-center gap-1 cursor-pointer hover:text-primary"
@@ -62,10 +62,17 @@ watch(
             {{ $t('product.name') }}
             <ArrowUpIcon class="w-3 h-3" :class="{ 'rotate-180': query.order === 'desc' }" />
           </th>
-          <th class="text-right">{{ $t('product.action') }}</th>
+          <th class="text-right lg:w-40">{{ $t('product.action') }}</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody v-if="isLoading">
+        <tr v-for="index in 10" :key="index">
+          <td v-for="index2 in 3" :key="index2">
+            <div class="skeleton h-4 w-full" />
+          </td>
+        </tr>
+      </tbody>
+      <tbody v-else>
         <tr v-for="product in products" :key="product.id" class="hover:bg-base-200">
           <td>{{ product.no }}</td>
           <td>{{ product.name }}</td>
