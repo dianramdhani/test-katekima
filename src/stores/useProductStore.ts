@@ -29,6 +29,7 @@ export const useProductStore = defineStore('product', () => {
   const route = useRoute()
   const router = useRouter()
   const products = ref(loadFromLocalStorage<Product[]>(STORAGE_KEY_PRODUCTS, []))
+  const isLoading = ref(true)
   const query = reactive<{
     search: string
     page: number
@@ -88,6 +89,7 @@ export const useProductStore = defineStore('product', () => {
         }
       })
     }
+    isLoading.value = false
   })
 
   watchEffect(() => {
@@ -119,6 +121,7 @@ export const useProductStore = defineStore('product', () => {
     query,
     paginatedProducts,
     totalPages,
+    isLoading,
     getProduct,
     addProduct,
     deleteProduct,

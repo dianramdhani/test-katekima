@@ -1,7 +1,13 @@
 <script setup lang="ts">
+import { saveToLocalStorage, STORAGE_KEY_LANG } from '@/utils/helpers'
 import { Bars3Icon } from '@heroicons/vue/24/solid'
+import { watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 const { locale } = useI18n()
+
+watchEffect(() => {
+  saveToLocalStorage(STORAGE_KEY_LANG, locale.value)
+})
 </script>
 
 <template>
